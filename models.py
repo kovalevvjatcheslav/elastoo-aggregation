@@ -14,8 +14,10 @@ def _insort_reverse(a, x, lo=0, hi=None):
         hi = len(a)
     while lo < hi:
         mid = (lo+hi)//2
-        if x > a[mid]: hi = mid
-        else: lo = mid+1
+        if x > a[mid]:
+            hi = mid
+        else:
+            lo = mid+1
     a.insert(lo, x)
 
 
