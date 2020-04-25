@@ -6,6 +6,10 @@ from operator import gt, lt
 from dateutil.parser import parse, ParserError
 
 
+class ColumnException(Exception):
+    pass
+
+
 class Row:
     def __init__(self, row_id: Union[int, str], data: {str: Union[int, float, str, datetime]}):
         self.row_id = row_id
@@ -55,10 +59,10 @@ class DataSet:
         return DataSet(rows, column_names)
 
     def min(self, column_names: [str] = None):
-        return self.__min_max(lt, column_names)
+        return self.__min_max(lt, self.__validate_column_names(column_names))
 
     def max(self, column_names: [str] = None):
-        return self.__min_max(gt, column_names)
+        return self.__min_max(gt, self.__validate_column_names(column_names))
 
     def __min_max(self, infix_operator: Union[gt, lt], column_names: [str] = None):
         if column_names is None:
@@ -69,6 +73,11 @@ class DataSet:
                 if result.get(column_name) is None or infix_operator(row.data.get(column_name), result[column_name]):
                     result[column_name] = row.data.get(column_name)
         return result
+
+    def __validate_column_names(self, column_names: [str] = None):
+        if column_names is not None and not set(self.column_names).issuperset(set(column_names)):
+            raise ColumnException(f'Column names ({set(column_names) - set(self.column_names)}) not found')
+        return column_names
 
     def __str__(self):
         return str([str(row) for row in self.rows])

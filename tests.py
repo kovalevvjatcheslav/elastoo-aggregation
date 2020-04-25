@@ -38,6 +38,11 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {'Дата продажи': 'Thu, 03 Jan 2019 00:00:00 GMT', 'Количество товара': 2})
 
+    def test_invalid_request(self):
+        response = self.client.get('/min?columns=Дата')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json, {'error': "Column names ({'Дата'}) not found"})
+
 
 if __name__ == '__main__':
     unittest.main()
