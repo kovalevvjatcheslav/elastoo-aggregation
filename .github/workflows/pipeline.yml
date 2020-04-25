@@ -16,3 +16,8 @@ jobs:
       run: pycodestyle --exclude=.git,.venv,__pycache__ --max-line-length=120 --count $PWD
     - name: Testing
       run: python tests.py
+    - name: Build the Docker image
+      run: |
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com -u kovalevvjatcheslav --password-stdin
+        docker build -f Dockerfile --force-rm -t "docker.pkg.github.com/kovalevvjatcheslav/elastoo-aggregation/elastoo:latest" .
+        docker push "docker.pkg.github.com/kovalevvjatcheslav/elastoo-aggregation/elastoo:latest"
