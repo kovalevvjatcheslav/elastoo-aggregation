@@ -2,8 +2,21 @@ from typing import Union
 from datetime import datetime
 from csv import DictReader
 from operator import gt, lt
+import bisect
 
 from dateutil.parser import parse, ParserError
+
+
+def _insort_reverse(a, x, lo=0, hi=None):
+    if lo < 0:
+        raise ValueError('lo must be non-negative')
+    if hi is None:
+        hi = len(a)
+    while lo < hi:
+        mid = (lo+hi)//2
+        if x > a[mid]: hi = mid
+        else: lo = mid+1
+    a.insert(lo, x)
 
 
 class ColumnException(Exception):
@@ -59,14 +72,31 @@ class DataSet:
         return DataSet(rows, column_names)
 
     def min(self, column_names: [str] = None):
-        return self.__min_max(lt, self.__validate_column_names(column_names))
+        return self.__min_max(lt, column_names)
 
     def max(self, column_names: [str] = None):
-        return self.__min_max(gt, self.__validate_column_names(column_names))
+        return self.__min_max(gt, column_names)
+
+    def sort(self, column_names: [str] = None, reverse: bool = False):
+        if column_names is None:
+            column_names = self.column_names
+        else:
+            self.__validate_column_names(column_names)
+        if reverse:
+            insort = _insort_reverse
+        else:
+            insort = bisect.insort
+        columns = {column_name: [] for column_name in column_names}
+        for row in self.rows:
+            for column_name in column_names:
+                insort(columns[column_name], row.data.get(column_name))
+        return columns
 
     def __min_max(self, infix_operator: Union[gt, lt], column_names: [str] = None):
         if column_names is None:
             column_names = self.column_names
+        else:
+            self.__validate_column_names(column_names)
         result = {}
         for row in self.rows:
             for column_name in column_names:
@@ -76,7 +106,7 @@ class DataSet:
 
     def __validate_column_names(self, column_names: [str] = None):
         if column_names is not None and not set(self.column_names).issuperset(set(column_names)):
-            raise ColumnException(f'Column names ({set(column_names) - set(self.column_names)}) not found')
+            raise ColumnException(f'Column names {set(column_names) - set(self.column_names)} not found')
         return column_names
 
     def __str__(self):

@@ -43,5 +43,11 @@ def get_max():
     return app.dataset.max(column_names=__prepare_args(request.args))
 
 
+@app.route('/sorted', methods=['GET'])
+@catch_exception
+def get_sort():
+    return app.dataset.sort(column_names=__prepare_args(request.args), reverse=True)
+
+
 if __name__ == "__main__":
     app.run(host='localhost', port='8000', debug=True)

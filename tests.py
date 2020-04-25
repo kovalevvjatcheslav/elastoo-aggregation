@@ -41,7 +41,15 @@ class TestAPI(unittest.TestCase):
     def test_invalid_request(self):
         response = self.client.get('/min?columns=Дата')
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json, {'error': "Column names ({'Дата'}) not found"})
+        self.assertEqual(response.json, {'error': "Column names {'Дата'} not found"})
+
+    def test_get_sorted(self):
+        response = self.client.get('/sorted?columns=Стоимость+товара')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {'Стоимость товара': [60000, 60000, 60000, 45000, 45000, 30000, 30000, 30000,
+                                                              30000, 30000, 20000, 20000, 20000, 16000, 16000, 14000,
+                                                              14000, 12000, 12000, 12000, 10000, 7500, 7000, 6000,
+                                                              6000, 6000, 6000]})
 
 
 if __name__ == '__main__':
