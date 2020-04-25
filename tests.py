@@ -20,7 +20,7 @@ class TestAPI(unittest.TestCase):
                                          'Стоимость товара': 6000})
 
     def test_get_min(self):
-        response = self.client.get('/min?columns=Дата+продажи,Количество+товара')
+        response = self.client.get('/min?columns=Дата+продажи&columns=Количество+товара')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {'Дата продажи': 'Tue, 01 Jan 2019 00:00:00 GMT', 'Количество товара': 1})
 
@@ -34,7 +34,7 @@ class TestAPI(unittest.TestCase):
                                          'Стоимость товара': 60000})
 
     def test_get_max(self):
-        response = self.client.get('/max?columns=Дата+продажи,Количество+товара')
+        response = self.client.get('/max?columns=Дата+продажи&columns=Количество+товара')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {'Дата продажи': 'Thu, 03 Jan 2019 00:00:00 GMT', 'Количество товара': 2})
 

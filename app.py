@@ -12,13 +12,6 @@ def init_dataset():
     app.dataset = DataSet.from_csv('datasource.csv')
 
 
-def __prepare_args(args):
-    columns = args.get('columns')
-    if columns is not None:
-        columns = columns.split(',')
-    return columns
-
-
 def catch_exception(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -34,19 +27,22 @@ def catch_exception(func):
 @app.route('/min', methods=['GET'])
 @catch_exception
 def get_min():
-    return app.dataset.min(column_names=__prepare_args(request.args))
+    column_names = request.args.getlist('columns') if request.args.getlist('columns') else None
+    return app.dataset.min(column_names=column_names)
 
 
 @app.route('/max', methods=['GET'])
 @catch_exception
 def get_max():
-    return app.dataset.max(column_names=__prepare_args(request.args))
+    column_names = request.args.getlist('columns') if request.args.getlist('columns') else None
+    return app.dataset.max(column_names=column_names)
 
 
 @app.route('/sorted', methods=['GET'])
 @catch_exception
 def get_sort():
-    return app.dataset.sort(column_names=__prepare_args(request.args), reverse=True)
+    column_names = request.args.getlist('columns') if request.args.getlist('columns') else None
+    return app.dataset.sort(column_names=column_names, reverse=True)
 
 
 if __name__ == "__main__":
